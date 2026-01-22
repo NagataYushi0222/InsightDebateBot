@@ -40,14 +40,18 @@ jobs:
       if: runner.os == 'Windows'
       shell: powershell
       run: |
-        # MSYS2 binaries are usually in C:\msys64\mingw64\bin
-        # We need libopus-0.dll
-        $opusPath = "C:\msys64\mingw64\bin\libopus-0.dll"
-        if (Test-Path $opusPath) {
-            Copy-Item $opusPath -Destination "libopus.dll"
+        # Search for libopus-0.dll in msys64 directory
+        Write-Host "Searching for libopus-0.dll..."
+        $dll = Get-ChildItem -Path C:\msys64 -Recurse -Filter "libopus-0.dll" -ErrorAction SilentlyContinue | Select-Object -First 1
+        
+        if ($dll) {
+            Write-Host "Found Opus DLL at: $($dll.FullName)"
+            Copy-Item $dll.FullName -Destination "libopus.dll"
             Write-Host "Opus DLL copied successfully."
         } else {
-            Write-Error "Could not find libopus-0.dll at $opusPath"
+            Write-Error "Could not find libopus-0.dll in C:\msys64"
+            # Fallback: List root directories to help debug if it fails again
+            Get-ChildItem C:\ -Depth 1
             exit 1
         }
 
