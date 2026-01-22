@@ -119,10 +119,15 @@ def get_discord_token():
     
     return token
 
+    return token
+
 # Load Opus
 if not discord.opus.is_loaded():
+    # Determine platform specific name
+    opus_filename = "libopus.dll" if os.name == 'nt' else "libopus.dylib"
+    
     # Try local bundle first (for PyInstaller)
-    bundled_opus = resource_path("libopus.dylib")
+    bundled_opus = resource_path(opus_filename)
     if os.path.exists(bundled_opus):
          try:
              discord.opus.load_opus(bundled_opus)
@@ -132,7 +137,13 @@ if not discord.opus.is_loaded():
     else:
         # Fallback to system env
         try:
-            discord.opus.load_opus("/opt/homebrew/lib/libopus.dylib")
+             # On Windows/Mac local dev, it might be in standard paths or PATH
+             # discord.py often finds it automatically on Windows if in PATH, 
+             # but we can try specific paths if needed.
+             if os.name != 'nt':
+                discord.opus.load_opus("/opt/homebrew/lib/libopus.dylib")
+             else:
+                discord.opus.load_opus("libopus-0.dll") # Try standard name
         except Exception as e:
             print(f"Could not load opus from default path: {e}")
 

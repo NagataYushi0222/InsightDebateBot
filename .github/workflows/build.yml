@@ -33,27 +33,17 @@ jobs:
       if: runner.os == 'Windows'
       uses: msys2/setup-msys2@v2
       with:
+        msystem: MINGW64
         install: mingw-w64-x86_64-opus
         path-type: strict
 
     - name: Prepare Opus DLL (Windows)
       if: runner.os == 'Windows'
-      shell: powershell
+      shell: msys2 {0}
       run: |
-        # Search for libopus-0.dll in msys64 directory
-        Write-Host "Searching for libopus-0.dll..."
-        $dll = Get-ChildItem -Path C:\msys64 -Recurse -Filter "libopus-0.dll" -ErrorAction SilentlyContinue | Select-Object -First 1
-        
-        if ($dll) {
-            Write-Host "Found Opus DLL at: $($dll.FullName)"
-            Copy-Item $dll.FullName -Destination "libopus.dll"
-            Write-Host "Opus DLL copied successfully."
-        } else {
-            Write-Error "Could not find libopus-0.dll in C:\msys64"
-            # Fallback: List root directories to help debug if it fails again
-            Get-ChildItem C:\ -Depth 1
-            exit 1
-        }
+        # Copy from MSYS2-native path to workspace
+        cp /mingw64/bin/libopus-0.dll ./libopus.dll
+        ls -l libopus.dll
 
     - name: Build with PyInstaller (Windows)
       if: runner.os == 'Windows'
