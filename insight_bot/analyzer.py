@@ -4,10 +4,8 @@ import os
 import time
 from .config import GEMINI_API_KEY, GEMINI_MODEL_FLASH
 
-# Initialize Client
-client = genai.Client(api_key=GEMINI_API_KEY)
-
-SYSTEM_PROMPT = """
+PROMPTS = {
+    "debate": """
 あなたはプロの議論アナリスト兼ファクトチェッカーです。提供された複数の音声ファイル（各ファイル名にユーザーIDまたは名前が含まれる）を分析し、以下の形式でレポートを作成してください。
 
 分析ルール:
@@ -20,9 +18,24 @@ SYSTEM_PROMPT = """
 【各ユーザーの立場】: (ユーザー名: 賛成/反対/中立などの属性と主要な意見)
 【現在の対立構造】: (何がボトルネックで合意に至っていないか)
 【争点と矛盾・ファクトチェック】: (発言の矛盾点や、最新のネット情報と照らし合わせた誤りの指摘)
-"""
+【対立点の折衷案】: (対立点を解決するための折衷案の提案)
+""",
+    "summary": """
+あなたは会議の書記です。提供された音声ファイルを分析し、途中から参加した人でも状況がわかるような親切な要約を作成してください。
 
-def upload_to_gemini(file_path, mime_type="audio/mp3"):
+分析ルール:
+1. 誰が何について話しているかを明確にしてください。
+2. 専門用語や文脈依存の単語には簡単な補足を加えてください。
+
+出力項目:
+【現在のトピック】: (今何を話しているか、数行でシンプルに)
+【これまでの流れ】: (時系列で主な発言と決定事項を箇条書き)
+【未解決の課題】: (まだ決まっていないこと、次に話すべきこと)
+【参加者の発言要旨】: (各参加者の主な主張)
+"""
+}
+
+def upload_to_gemini(client, file_path, mime_type="audio/mp3"):
     """
     Uploads a file to Gemini File API using google-genai SDK.
     """
@@ -35,7 +48,7 @@ def upload_to_gemini(file_path, mime_type="audio/mp3"):
         print(f"Upload failed: {e}")
         raise e
 
-def wait_for_files_active(files):
+def wait_for_files_active(client, files):
     """
     Waits for files to proceed to ACTIVE state.
     """
@@ -61,22 +74,38 @@ def wait_for_files_active(files):
                 
     print("...all files ready")
 
-def analyze_discussion(audio_files_map, context_history="", user_map=None):
+def analyze_discussion(audio_files_map, context_history="", user_map=None, api_key=None, mode="debate"):
     """
     analyzes the discussion.
     audio_files_map: dict of {user_id: mp3_file_path}
     user_map: dict of {user_id: user_name}
+    api_key: str (Optional) - if passed, use this key. Else use env default.
+    mode: str - "debate" or "summary"
     """
     
+    # Determine API Key
+    use_key = api_key if api_key else GEMINI_API_KEY
+    if not use_key:
+        return "❌ APIキーが設定されていません。`/settings set_key` で設定してください。"
+
+    # Initialize Client with specific key
+    try:
+        client = genai.Client(api_key=use_key)
+    except Exception as e:
+        return f"❌ APIクライアントの初期化に失敗しました: {e}"
+
     uploaded_files = []
     
+    # Determine Prompt
+    system_prompt = PROMPTS.get(mode, PROMPTS["debate"])
+
     # Construct content parts
     contents = []
     
-    # Add System Prompt as text part (or system instruction if supported, but part of user msg is fine for Flash)
+    # Add System Prompt
     contents.append(types.Content(
         role="user",
-        parts=[types.Part.from_text(text=SYSTEM_PROMPT)]
+        parts=[types.Part.from_text(text=system_prompt)]
     ))
     
     if context_history:
@@ -92,7 +121,7 @@ def analyze_discussion(audio_files_map, context_history="", user_map=None):
             user_name = user_map.get(user_id, f"User_{user_id}") if user_map else f"User_{user_id}"
             
             try:
-                uploaded_file = upload_to_gemini(file_path)
+                uploaded_file = upload_to_gemini(client, file_path)
                 uploaded_files.append(uploaded_file)
                 
                 current_turn_parts.append(types.Part.from_text(text=f"発言者: {user_name}"))
@@ -114,7 +143,7 @@ def analyze_discussion(audio_files_map, context_history="", user_map=None):
     ))
 
     try:
-        wait_for_files_active(uploaded_files)
+        wait_for_files_active(client, uploaded_files)
         
         # Configure tools
         # Enable Google Search
@@ -145,5 +174,5 @@ def analyze_discussion(audio_files_map, context_history="", user_map=None):
     except Exception as e:
         print(f"Analysis Error: {e}")
         if "429" in str(e) or "Quota exceeded" in str(e):
-             return "⚠️ 分析のリクエスト制限（Quota Limit）に達しました。次回の分析までお待ちください。"
+             return "⚠️ 分析のリクエスト制限（Quota Limit）に達しました。"
         return f"分析中にエラーが発生しました: {e}"
