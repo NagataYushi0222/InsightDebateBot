@@ -1,0 +1,5 @@
+py-cord
+google-genai
+pydub
+python-dotenv
+PyNaCl
