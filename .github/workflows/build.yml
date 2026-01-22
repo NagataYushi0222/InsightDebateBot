@@ -48,11 +48,10 @@ jobs:
     - name: Build with PyInstaller (Windows)
       if: runner.os == 'Windows'
       run: |
-        # Windows: Onefile is fine and preferred for single exe distribution
-        pyinstaller --noconfirm --clean --onefile --windowed --name "InsightDebateBot" \
-          --add-binary "libopus.dll;." \
-          --hidden-import certifi \
-          --collect-data certifi \
+        pyinstaller --noconfirm --clean --onefile --windowed --name "InsightDebateBot" `
+          --add-binary "libopus.dll;." `
+          --hidden-import certifi `
+          --collect-data certifi `
           main.py
 
     # --- macOS Specific (Onedir for .app bundle) ---
