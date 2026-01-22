@@ -1,0 +1,68 @@
+# InsightDebate Bot
+
+Discord上のボイスチャットを自動録音・分析し、議論の要約や対立構造を可視化するAI Botです。
+
+## 特徴
+- 📹 **ユーザーごとの音声録音**: 各参加者の発言を個別に記録
+- 🤖 **Gemini AIによる分析**: Google Gemini APIで音声を文字起こし・分析
+- 🔍 **ファクトチェック**: Google検索機能で発言内容の正確性を確認
+- 📊 **2つのモード**: 「議論分析」と「会議要約」を選択可能
+- 💰 **完全無料**: サーバー代・API利用料は各自負担（BYOKモデル）
+
+## クイックスタート（アプリ版）
+
+### 1. Discord Botの作成
+1. [Discord Developer Portal](https://discord.com/developers/applications)にアクセス
+2. 「New Application」をクリック
+3. 名前を入力して作成
+4. 左メニュー「Bot」→「Reset Token」→トークンをコピー（このトークンは二度と表示されないので注意！）
+5. 下にスクロールして以下をONにする：
+   - **Presence Intent**
+   - **Server Members Intent**
+   - **Message Content Intent**
+6. 左メニュー「OAuth2」→「URL Generator」
+   - Scopesで `bot` と `applications.commands` を選択
+   - Bot Permissionsで以下を選択：
+     - Send Messages
+     - Send Messages in Threads
+     - Create Public Threads
+     - Connect (Voice)
+     - Speak (Voice)
+7. 生成されたURLをコピーして、ブラウザで開く → Botをサーバーに追加
+
+### 2. Gemini APIキーの取得
+1. [Google AI Studio](https://aistudio.google.com/app/apikey)にアクセス
+2. 「Create API Key」をクリック
+3. キーをコピー
+
+### 3. アプリの起動
+1. ダウンロードしたアプリを起動
+2. 初回起動時、GUIが表示される
+3. 手順1で取得したDiscord Bot Tokenを入力
+4. 「保存して起動」をクリック
+
+### 4. 使用方法
+1. 分析したいボイスチャンネルに参加
+2. テキストチャンネルで `/settings set_key <Gemini APIキー>` を実行
+3. `/analyze_start` で分析開始
+4. `/analyze_stop` で終了
+
+## コマンド一覧
+- `/analyze_start` - 録音・分析を開始
+- `/analyze_stop` - 停止してVCから退出
+- `/settings set_key <key>` - Gemini APIキーを設定
+- `/settings set_mode <debate|summary>` - 分析モード変更
+- `/settings set_interval <秒>` - レポート間隔変更（デフォルト300秒=5分）
+
+## トラブルシューティング
+
+### macOSで「開発元が未確認」と表示される
+```bash
+xattr -cr InsightDebateBot.app
+```
+
+### Windowsで「WindowsによってPCが保護されました」
+「詳細情報」→「実行」をクリック
+
+## ライセンス
+MIT License

@@ -62,8 +62,8 @@ def get_discord_token():
                 webbrowser.open("https://discord.com/developers/applications")
                 
             def open_guide():
-                # Replace with your actual guide URL if available
-                webbrowser.open("https://github.com/osadayuushi/InsightDebateBot/blob/main/SELF_HOSTING_GUIDE.md")
+                # Open the README which will have setup instructions
+                webbrowser.open("https://github.com/NagataYushi0222/InsightDebateBot#readme")
 
             def save_and_start():
                 input_token = token_var.get().strip()
@@ -91,7 +91,7 @@ def get_discord_token():
             btn_frame = tk.Frame(root)
             btn_frame.pack(pady=10)
             
-            tk.Button(btn_frame, text="1. 作り方を見る (ガイド)", command=open_guide, bg="#e0e0e0").pack(side=tk.LEFT, padx=5)
+            tk.Button(btn_frame, text="1. 作り方を見る (ガイド)", command=open_guide, bg="#e0e0e0", fg="black").pack(side=tk.LEFT, padx=5)
             tk.Button(btn_frame, text="2. Developer Portalを開く", command=open_portal, bg="#5865F2", fg="white").pack(side=tk.LEFT, padx=5)
             
             # Input
