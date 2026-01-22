@@ -9,6 +9,11 @@ import sys
 import tkinter as tk
 from tkinter import simpledialog, messagebox
 
+# Fix SSL certificate issue for PyInstaller builds
+if getattr(sys, 'frozen', False):
+    import certifi
+    os.environ['SSL_CERT_FILE'] = certifi.where()
+
 # Initialize Database
 init_db()
 

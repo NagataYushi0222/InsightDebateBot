@@ -5,3 +5,4 @@ python-dotenv
 PyNaCl
 setuptools
 wheel
+certifi
