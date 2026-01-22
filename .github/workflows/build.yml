@@ -78,4 +78,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: InsightDebateBot-macOS
-        path: dist/InsightDebateBot.app
+        path: dist/
