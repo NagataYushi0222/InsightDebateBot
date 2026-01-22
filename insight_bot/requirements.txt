@@ -3,3 +3,5 @@ google-genai
 pydub
 python-dotenv
 PyNaCl
+setuptools
+wheel
