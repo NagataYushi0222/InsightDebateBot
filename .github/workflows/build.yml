@@ -48,7 +48,7 @@ jobs:
     - name: Build with PyInstaller (Windows)
       if: runner.os == 'Windows'
       run: |
-        pyinstaller --noconfirm --clean --onefile --windowed --name "InsightDebateBot" `
+        pyinstaller --noconfirm --clean --onefile --console --name "InsightDebateBot" `
           --add-binary "libopus.dll;." `
           --hidden-import certifi `
           --collect-data certifi `
@@ -65,8 +65,7 @@ jobs:
     - name: Build with PyInstaller (macOS)
       if: runner.os == 'macOS'
       run: |
-        # macOS: Use --onedir for valid .app bundle structure
-        pyinstaller --noconfirm --clean --onedir --windowed --name "InsightDebateBot" \
+        pyinstaller --noconfirm --clean --onedir --console --name "InsightDebateBot" \
           --add-binary "libopus.dylib:." \
           --hidden-import certifi \
           --collect-data certifi \
