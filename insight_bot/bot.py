@@ -92,7 +92,7 @@ def get_discord_token():
             btn_frame.pack(pady=10)
             
             tk.Button(btn_frame, text="1. 作り方を見る (ガイド)", command=open_guide, bg="#e0e0e0", fg="black").pack(side=tk.LEFT, padx=5)
-            tk.Button(btn_frame, text="2. Developer Portalを開く", command=open_portal, bg="#5865F2", fg="white").pack(side=tk.LEFT, padx=5)
+            tk.Button(btn_frame, text="2. Developer Portalを開く", command=open_portal, bg="#5865F2", fg="black").pack(side=tk.LEFT, padx=5)
             
             # Input
             tk.Label(root, text="Bot Tokenを貼り付けてください:", font=("Helvetica", 10, "bold")).pack(pady=(15, 5))
@@ -100,7 +100,7 @@ def get_discord_token():
             entry.pack(pady=5)
             
             # Submit
-            tk.Button(root, text="保存して起動", command=save_and_start, bg="#43B581", fg="white", font=("Helvetica", 12, "bold")).pack(pady=20)
+            tk.Button(root, text="保存して起動", command=save_and_start, bg="#43B581", fg="black", font=("Helvetica", 12, "bold")).pack(pady=20)
             
             # Main Loop
             root.mainloop()
