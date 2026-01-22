@@ -18,8 +18,15 @@ intents.voice_states = True
 # Resource Path Helper
 def resource_path(relative_path):
     """ Get absolute path to resource, works for dev and for PyInstaller """
-    if hasattr(sys, '_MEIPASS'):
-        return os.path.join(sys._MEIPASS, relative_path)
+    if getattr(sys, 'frozen', False):
+        # PyInstaller Mode
+        if hasattr(sys, '_MEIPASS'):
+            # Onefile
+            return os.path.join(sys._MEIPASS, relative_path)
+        else:
+            # Onedir
+            return os.path.join(os.path.dirname(sys.executable), relative_path)
+    # Dev Mode
     return os.path.join(os.path.abspath("."), relative_path)
 
 import webbrowser

@@ -10,6 +10,7 @@ jobs:
     name: Build for ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [macos-latest, windows-latest]
 
@@ -27,47 +28,60 @@ jobs:
         pip install -r insight_bot/requirements.txt
         pip install pyinstaller
 
-    # --- Windows Specific ---
-    - name: Download Opus (Windows)
+    # --- Windows Specific (Use MSYS2 for reliable Opus) ---
+    - name: Install Opus (Windows via MSYS2)
       if: runner.os == 'Windows'
+      uses: msys2/setup-msys2@v2
+      with:
+        install: mingw-w64-x86_64-opus
+        path-type: strict
+
+    - name: Prepare Opus DLL (Windows)
+      if: runner.os == 'Windows'
+      shell: powershell
       run: |
-        # Downloading a pre-built libopus.dll
-        Invoke-WebRequest -Uri "https://github.com/losttech/libopus/releases/download/v1.3.1/libopus-1.3.1-x64.zip" -OutFile "opus.zip"
-        Expand-Archive opus.zip -DestinationPath .
-        
-        # Debug: List files to ensure correct path
-        Get-ChildItem -Recurse
-        
-        # Move DLL (Adjust path if needed based on debug output)
-        if (Test-Path "libopus-1.3.1-x64/libopus-0.dll") {
-            Move-Item -Path "libopus-1.3.1-x64/libopus-0.dll" -Destination "libopus.dll"
+        # MSYS2 binaries are usually in C:\msys64\mingw64\bin
+        # We need libopus-0.dll
+        $opusPath = "C:\msys64\mingw64\bin\libopus-0.dll"
+        if (Test-Path $opusPath) {
+            Copy-Item $opusPath -Destination "libopus.dll"
+            Write-Host "Opus DLL copied successfully."
         } else {
-            Write-Error "libopus-0.dll not found in expected path!"
+            Write-Error "Could not find libopus-0.dll at $opusPath"
+            exit 1
         }
 
     - name: Build with PyInstaller (Windows)
       if: runner.os == 'Windows'
       run: |
+        # Windows: Onefile is fine and preferred for single exe distribution
         pyinstaller --noconfirm --clean --onefile --windowed --name "InsightDebateBot" --add-binary "libopus.dll;." main.py
 
-    # --- macOS Specific ---
+    # --- macOS Specific (Onedir for .app bundle) ---
     - name: Install Opus (macOS)
       if: runner.os == 'macOS'
       run: |
         brew install opus
-        # Find where brew installed it
         OPUS_PATH=$(brew --prefix opus)/lib/libopus.dylib
-        echo "Opus found at $OPUS_PATH"
         cp "$OPUS_PATH" ./libopus.dylib
 
     - name: Build with PyInstaller (macOS)
       if: runner.os == 'macOS'
       run: |
-        pyinstaller --noconfirm --clean --onefile --windowed --name "InsightDebateBot" --add-binary "libopus.dylib:." main.py
+        # macOS: Use --onedir for valid .app bundle structure
+        pyinstaller --noconfirm --clean --onedir --windowed --name "InsightDebateBot" --add-binary "libopus.dylib:." main.py
 
     # --- Artifact Upload ---
-    - name: Upload Artifact
+    - name: Upload Artifact (Windows)
+      if: runner.os == 'Windows'
       uses: actions/upload-artifact@v4
       with:
-        name: InsightDebateBot-${{ matrix.os }}
-        path: dist/
+        name: InsightDebateBot-Windows
+        path: dist/InsightDebateBot.exe
+
+    - name: Upload Artifact (macOS)
+      if: runner.os == 'macOS'
+      uses: actions/upload-artifact@v4
+      with:
+        name: InsightDebateBot-macOS
+        path: dist/InsightDebateBot.app
