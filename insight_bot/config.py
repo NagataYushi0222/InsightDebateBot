@@ -13,7 +13,7 @@ SAMPLE_RATE = 48000
 CHANNELS = 2
 
 # Models
-GEMINI_MODEL_FLASH = "gemini-flash-latest"
+GEMINI_MODEL_FLASH = "gemini-2.0-flash-exp"
 GEMINI_MODEL_PRO = "gemini-pro-latest"
 
 # Paths
