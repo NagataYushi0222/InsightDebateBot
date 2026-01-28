@@ -10,6 +10,7 @@ services:
     # 環境変数（.envファイルから読み込み、または直接指定）
     environment:
       - DISCORD_TOKEN=${DISCORD_TOKEN}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
       - PYTHONUNBUFFERED=1
 
     # ローカルのデータベースを永続化する場合
