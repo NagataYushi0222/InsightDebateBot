@@ -1,0 +1,41 @@
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# 環境変数・設定ファイル
+.env
+.env.local
+token.txt
+*.db
+
+# Git
+.git
+.gitignore
+.github
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 一時ファイル
+temp_audio/*
+logs/
+*.log
+
+# テストファイル
+test_*.py
+inspect_*.py
+list_models*.py

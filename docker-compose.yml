@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  bot:
+    build: .
+    image: insightdebate-bot:latest
+    container_name: insightdebate-bot
+    restart: unless-stopped
+
+    # 環境変数（.envファイルから読み込み、または直接指定）
+    environment:
+      - DISCORD_TOKEN=${DISCORD_TOKEN}
+      - PYTHONUNBUFFERED=1
+
+    # ローカルのデータベースを永続化する場合
+    volumes:
+      - ./bot_settings.db:/app/bot_settings.db
+      - ./temp_audio:/app/temp_audio
+
+    # ログ設定
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
