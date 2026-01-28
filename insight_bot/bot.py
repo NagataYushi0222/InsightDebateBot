@@ -4,10 +4,7 @@ import os
 from .config import DISCORD_TOKEN, GUILD_ID
 from .database import init_db, update_guild_setting, get_guild_settings
 from .session_manager import SessionManager
-
 import sys
-import tkinter as tk
-from tkinter import simpledialog, messagebox
 
 # Initialize Database
 init_db()
@@ -40,9 +37,13 @@ def get_discord_token():
         with open("token.txt", "r") as f:
             token = f.read().strip()
             
-    # 3. Prompt User (Custom GUI)
+    # 3. Prompt User (Custom GUI or CLI fallback)
     if not token:
+        # Try to import tkinter for GUI - if it fails, fall back to CLI
         try:
+            import tkinter as tk
+            from tkinter import simpledialog, messagebox
+            
             # Create a custom setup window
             root = tk.Tk()
             root.title("InsightDebateBot - Initial Setup")
@@ -110,16 +111,24 @@ def get_discord_token():
                 with open("token.txt", "r") as f:
                     token = f.read().strip()
             
-        except Exception as e:
-            print(f"GUI Error: {e}")
-            token = input("GUI Failed. Please enter your Discord Bot Token: ")
+        except (ImportError, Exception) as e:
+            # GUI not available or failed - fall back to CLI input
+            print(f"GUI not available (running in CLI mode): {e}")
+            print("\n=== InsightDebateBot - Initial Setup ===")
+            print("Please enter your Discord Bot Token.")
+            print("If you don't have one yet:")
+            print("  1. Visit: https://discord.com/developers/applications")
+            print("  2. Create a new application and bot")
+            print("  3. Copy the bot token\n")
+            
+            token = input("Discord Bot Token: ").strip()
             if token:
                 with open("token.txt", "w") as f:
-                    f.write(token.strip())
+                    f.write(token)
+                print("✅ Token saved to token.txt")
     
     return token
 
-    return token
 
 # Load Opus
 if not discord.opus.is_loaded():
