@@ -45,8 +45,17 @@ class GuildSession:
         self.voice_client = None
         self.active_sink = None
 
-    async def finished_callback(self, sink, channel, *args):
-        pass
+    async def finished_callback(self, sink, *args):
+        # args[0] is typically the channel if passed to start_recording, 
+        # but the signature from discord.py is (sink, *args)
+        # We don't need to do specific logic here as we handle flush in process_loop
+        # and final cleanup in stop_recording.
+        # But we must accept the arguments to avoid TypeError.
+        # Ensure any remaining audio is flushed (best effort)
+        try:
+             await sink.flush_audio()
+        except:
+             pass
 
     async def process_loop(self):
         await self.bot.wait_until_ready()

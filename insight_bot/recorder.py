@@ -22,6 +22,14 @@ class UserSpecificSink(discord.sinks.Sink):
     def write_user_audio(self, user_id, audio_data):
         pass
 
+    def format_audio(self, audio):
+        """
+        Required by discord.sinks.Sink.
+        We are handling raw PCM data, so we don't need complex formatting here,
+        but the method must exist for the Sink to close properly without error.
+        """
+        pass
+
     def get_user_audio(self, user_id):
         return self.audio_data.get(user_id)
 
