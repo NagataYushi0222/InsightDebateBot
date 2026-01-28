@@ -27,7 +27,7 @@ VPSや自宅サーバーで24時間稼働させたい場合は、この方法が
 
 2. 設定ファイルを作成
    ```bash
-   cp .env.example .env
+   cp env.template .env
    # .envファイルを開いて、DISCORD_TOKENを入力してください
    ```
 
