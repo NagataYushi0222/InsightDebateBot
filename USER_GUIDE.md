@@ -33,7 +33,7 @@ VPSや自宅サーバーで24時間稼働させたい場合は、この方法が
 
 3. 起動！
    ```bash
-   docker-compose up -d
+   docker compose up -d
    ```
    これだけでバックグラウンドで動き出します！
 
