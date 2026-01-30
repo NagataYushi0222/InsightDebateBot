@@ -4,7 +4,9 @@ import os
 import sys
 import webbrowser
 import requests
-import google.generativeai as genai
+import google.genai as genai_sdk # Rename to avoid conflict if any, though actually it's a module
+from google import genai
+
 from .config import DISCORD_TOKEN, GUILD_ID
 from .database import init_db, update_guild_setting, get_guild_settings
 from .session_manager import SessionManager
@@ -35,11 +37,13 @@ def validate_discord_token(token):
 
 def validate_gemini_key(key):
     try:
-        genai.configure(api_key=key)
-        # Try listing models to verify key
-        list(genai.list_models())
+        client = genai.Client(api_key=key)
+        # Try listing models to verify key (fetching first page is enough)
+        # The new SDK returns an iterator/generator
+        next(client.models.list(), None) 
         return True
     except:
+        # In case next() fails because list is empty (unlikely) or auth fails
         return False
 
 def setup_credentials():
