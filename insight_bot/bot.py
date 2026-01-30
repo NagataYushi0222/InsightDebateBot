@@ -1,10 +1,13 @@
 import discord
 from discord.ext import commands
 import os
+import sys
+import webbrowser
+import requests
+import google.generativeai as genai
 from .config import DISCORD_TOKEN, GUILD_ID
 from .database import init_db, update_guild_setting, get_guild_settings
 from .session_manager import SessionManager
-import sys
 
 # Initialize Database
 init_db()
@@ -16,126 +19,73 @@ intents.voice_states = True
 def resource_path(relative_path):
     """ Get absolute path to resource, works for dev and for PyInstaller """
     if getattr(sys, 'frozen', False):
-        # PyInstaller Mode
         if hasattr(sys, '_MEIPASS'):
-            # Onefile
             return os.path.join(sys._MEIPASS, relative_path)
         else:
-            # Onedir
             return os.path.join(os.path.dirname(sys.executable), relative_path)
-    # Dev Mode
     return os.path.join(os.path.abspath("."), relative_path)
 
-import webbrowser
+def validate_discord_token(token):
+    headers = {"Authorization": f"Bot {token}"}
+    try:
+        response = requests.get("https://discord.com/api/v10/users/@me", headers=headers)
+        return response.status_code == 200
+    except:
+        return False
 
-def get_discord_token():
-    # 1. Try Environment Variable
-    token = DISCORD_TOKEN
+def validate_gemini_key(key):
+    try:
+        genai.configure(api_key=key)
+        # Try listing models to verify key
+        list(genai.list_models())
+        return True
+    except:
+        return False
+
+def setup_credentials():
+    # 1. Try Environment Variables (from .env or system)
+    token = os.getenv("DISCORD_TOKEN") or DISCORD_TOKEN
+    api_key = os.getenv("GEMINI_API_KEY")
+
+    # If both exist and appear valid-ish (basic check), skip setup
+    if token and api_key:
+        return token
+
+    # 2. CLI Setup (Unified for App/Docker)
+    print("Credentials not found. Launching setup...")
+    print("GUI is disabled to ensure consistent behavior with Docker.")
     
-    # 2. Try Local File (token.txt)
-    if not token and os.path.exists("token.txt"):
-        with open("token.txt", "r") as f:
-            token = f.read().strip()
+    while True:
+        print("\n=== InsightDebateBot Setup ===")
+        print("Please enter your credentials.")
+        
+        i_token = input("Discord Bot Token: ").strip()
+        if not i_token: continue
+        
+        if not validate_discord_token(i_token):
+            print("❌ Invalid Discord Token. Please try again.")
+            continue
             
-    # 3. Prompt User (Custom GUI or CLI fallback)
-    if not token:
-        # Try to import tkinter for GUI - if it fails, fall back to CLI
-        try:
-            import tkinter as tk
-            from tkinter import simpledialog, messagebox
-            
-            # Create a custom setup window
-            root = tk.Tk()
-            root.title("InsightDebateBot - Initial Setup")
-            
-            # Center window
-            window_width = 500
-            window_height = 350
-            screen_width = root.winfo_screenwidth()
-            screen_height = root.winfo_screenheight()
-            center_x = int(screen_width/2 - window_width/2)
-            center_y = int(screen_height/2 - window_height/2)
-            root.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
-            
-            token_var = tk.StringVar()
-            
-            def open_portal():
-                webbrowser.open("https://discord.com/developers/applications")
-                
-            def open_guide():
-                # Open the README which will have setup instructions
-                webbrowser.open("https://github.com/NagataYushi0222/InsightDebateBot#readme")
-
-            def save_and_start():
-                input_token = token_var.get().strip()
-                if not input_token:
-                    messagebox.showerror("Error", "トークンが入力されていません。")
-                    return
-                
-                with open("token.txt", "w") as f:
-                    f.write(input_token)
-                
-                messagebox.showinfo("Success", "設定完了！アプリを起動します。")
-                root.destroy()
-
-            # UI Elements
-            tk.Label(root, text="InsightDebateBot へようこそ！", font=("Helvetica", 16, "bold")).pack(pady=10)
-            
-            intro_text = (
-                "このアプリを利用するには、あなた自身のDiscord Botを作成し、\n"
-                "その「Bot Token」を入力する必要があります。\n\n"
-                "サーバー代はかかりません。無料で利用できます。"
-            )
-            tk.Label(root, text=intro_text, justify="center").pack(pady=5)
-            
-            # Buttons Frame
-            btn_frame = tk.Frame(root)
-            btn_frame.pack(pady=10)
-            
-            tk.Button(btn_frame, text="1. 作り方を見る (ガイド)", command=open_guide, bg="#e0e0e0", fg="black").pack(side=tk.LEFT, padx=5)
-            tk.Button(btn_frame, text="2. Developer Portalを開く", command=open_portal, bg="#5865F2", fg="black").pack(side=tk.LEFT, padx=5)
-            
-            # Input
-            tk.Label(root, text="Bot Tokenを貼り付けてください:", font=("Helvetica", 10, "bold")).pack(pady=(15, 5))
-            entry = tk.Entry(root, textvariable=token_var, width=50)
-            entry.pack(pady=5)
-            
-            # Submit
-            tk.Button(root, text="保存して起動", command=save_and_start, bg="#43B581", fg="black", font=("Helvetica", 12, "bold")).pack(pady=20)
-            
-            # Main Loop
-            root.mainloop()
-            
-            # Retrieve token after window closes
-            if os.path.exists("token.txt"):
-                with open("token.txt", "r") as f:
-                    token = f.read().strip()
-            
-        except (ImportError, Exception) as e:
-            # GUI not available or failed - fall back to CLI input
-            print(f"GUI not available (running in CLI mode): {e}")
-            print("\n=== InsightDebateBot - Initial Setup ===")
-            print("Please enter your Discord Bot Token.")
-            print("If you don't have one yet:")
-            print("  1. Visit: https://discord.com/developers/applications")
-            print("  2. Create a new application and bot")
-            print("  3. Copy the bot token\n")
-            
-            token = input("Discord Bot Token: ").strip()
-            if token:
-                with open("token.txt", "w") as f:
-                    f.write(token)
-                print("✅ Token saved to token.txt")
-    
-    return token
-
+        i_key = input("Gemini API Key: ").strip()
+        if not i_key: continue
+        
+        if not validate_gemini_key(i_key):
+            print("❌ Invalid Gemini API Key. Please try again.")
+            continue
+        
+        # Save
+        with open(".env", "w") as f:
+            f.write(f"DISCORD_TOKEN={i_token}\n")
+            f.write(f"GEMINI_API_KEY={i_key}\n")
+        
+        os.environ["DISCORD_TOKEN"] = i_token
+        os.environ["GEMINI_API_KEY"] = i_key
+        print("✅ Credentials saved to .env. Starting bot...")
+        return i_token
 
 # Load Opus
 if not discord.opus.is_loaded():
-    # Determine platform specific name
     opus_filename = "libopus.dll" if os.name == 'nt' else "libopus.dylib"
-    
-    # Try local bundle first (for PyInstaller)
     bundled_opus = resource_path(opus_filename)
     if os.path.exists(bundled_opus):
          try:
@@ -144,46 +94,29 @@ if not discord.opus.is_loaded():
          except Exception as e:
              print(f"Failed to load bundled opus: {e}")
     else:
-        # Fallback to system env
         try:
-             # On Windows/Mac local dev, it might be in standard paths or PATH
-             # discord.py often finds it automatically on Windows if in PATH, 
-             # but we can try specific paths if needed.
              if os.name != 'nt':
                 discord.opus.load_opus("/opt/homebrew/lib/libopus.dylib")
              else:
-                discord.opus.load_opus("libopus-0.dll") # Try standard name
+                discord.opus.load_opus("libopus-0.dll")
         except Exception as e:
             print(f"Could not load opus from default path: {e}")
 
-# If you want Global Commands for public release, remove debug_guilds or make it None.
-# For now, we keep it if GUILD_ID is set for testing, but typically for public bot you pass None.
 debug_guilds = [int(GUILD_ID)] if GUILD_ID else None
-
 bot = commands.Bot(command_prefix='/', intents=intents, debug_guilds=debug_guilds)
 session_manager = SessionManager(bot)
-
 
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user}')
     try:
         synced = await bot.sync_commands()
-        if synced:
-            print(f"Synced {len(synced)} commands.")
-        else:
-            print("Synced commands (no list returned).")
+        print(f"Synced {len(synced)} commands.")
     except Exception as e:
         print(f"Failed to sync commands: {e}")
 
 # --- Settings Commands ---
 settings_group = bot.create_group("settings", "Botの設定を変更します")
-
-@settings_group.command(name="set_key", description="Gemini APIキーを設定します（BYOK）")
-async def set_key(ctx, key: str):
-    # Security note: In a real public bot, you might want to validate the key first.
-    update_guild_setting(ctx.guild.id, 'api_key', key)
-    await ctx.respond("✅ APIキーを更新しました。次回分析からこのキーが使用されます。", ephemeral=True)
 
 @settings_group.command(name="set_mode", description="分析モードを変更します (debate / summary)")
 async def set_mode(ctx, mode: str):
@@ -236,20 +169,31 @@ async def analyze_start(ctx):
              await session.stop_recording()
         await ctx.followup.send(f"エラーが発生しました: {e}")
 
+@bot.slash_command(name="analyze_now", description="すぐにレポートを作成します（分析間隔を待たずに実行）")
+async def analyze_now(ctx):
+    session = session_manager.get_session(ctx.guild.id)
+    
+    if session.voice_client and session.voice_client.is_connected():
+        await ctx.respond("🔄 手動分析を開始しました...")
+        await session.force_analysis()
+    else:
+        await ctx.respond("分析は実行されていません。先に /analyze_start を実行してください。", ephemeral=True)
+
 @bot.slash_command(name="analyze_stop", description="分析を終了し、ボイスチャットから退出します")
 async def analyze_stop(ctx):
     session = session_manager.get_session(ctx.guild.id)
     
     if session.voice_client and session.voice_client.is_connected():
+        await ctx.respond("🔄 最終レポートを作成して終了します。しばらくお待ちください...")
         await session.stop_recording()
         # Clean up session from manager
         await session_manager.cleanup_session(ctx.guild.id)
-        await ctx.respond("分析を終了しました。")
+        await ctx.followup.send("✅ 分析を終了しました。お疲れ様でした！")
     else:
         await ctx.respond("分析は実行されていません。", ephemeral=True)
 
 def run_bot():
-    token = get_discord_token()
+    token = setup_credentials()
     if token:
         bot.run(token)
     else:
