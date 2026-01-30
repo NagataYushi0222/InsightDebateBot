@@ -115,7 +115,10 @@ async def on_ready():
     print(f'Logged in as {bot.user}')
     try:
         synced = await bot.sync_commands()
-        print(f"Synced {len(synced)} commands.")
+        if synced:
+            print(f"Synced {len(synced)} commands.")
+        else:
+            print("Synced commands (global).")
     except Exception as e:
         print(f"Failed to sync commands: {e}")
 
