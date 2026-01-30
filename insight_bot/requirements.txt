@@ -1,5 +1,5 @@
 py-cord
-google-genai
+google-generativeai
 pydub
 python-dotenv
 PyNaCl
