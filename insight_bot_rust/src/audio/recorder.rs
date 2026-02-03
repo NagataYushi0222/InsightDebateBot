@@ -92,13 +92,14 @@ impl UserRecorder {
     /// This is called for each voice packet received
     pub fn process_voice_tick(&self, tick: &VoiceTick) {
         for (ssrc, data) in &tick.speaking {
-            // Get user ID from SSRC mapping if available
-            if let Some(user_id) = data.decoded_voice.as_ref().and_then(|_| {
-                // In real implementation, we need SSRC -> UserId mapping
-                // For now, we'll use SSRC as a temporary ID
-                None::<UserId>
-            }) {
-                self.add_audio_data(user_id, &[]);
+            // Use SSRC as temporary User ID (u32 -> u64)
+            let user_id = UserId::new(*ssrc as u64);
+
+            if let Some(packet) = &data.packet {
+                let payload = &packet.payload;
+                if !payload.is_empty() {
+                    self.add_opus_packet(user_id, payload);
+                }
             }
         }
     }

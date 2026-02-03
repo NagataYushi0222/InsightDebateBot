@@ -105,24 +105,8 @@ pub struct VoiceReceiver {
 impl VoiceEventHandler for VoiceReceiver {
     async fn act(&self, ctx: &EventContext<'_>) -> Option<Event> {
         if let EventContext::VoiceTick(tick) = ctx {
-            // Process each speaking user's audio
-            for (ssrc, data) in &tick.speaking {
-                // Get the decoded voice data if available
-                if let Some(decoded) = &data.decoded_voice {
-                    // We have PCM data, but we want to save Opus directly
-                    // For raw Opus, we'd need to access the packet before decoding
-                    // For now, we'll note that Songbird provides decoded PCM by default
-                    
-                    // In a full implementation, we'd configure Songbird to give us raw Opus
-                    // For now, we'll re-encode PCM to Opus (less efficient but works)
-                }
-                
-                // If we have the original Opus packet (requires special Songbird config)
-                if let Some(packet) = &data.packet {
-                    // This contains the raw Opus data
-                    // We can save this directly for maximum efficiency
-                }
-            }
+            // Forward the tick to the recorder to process all speaking users
+            self.recorder.process_voice_tick(tick);
         }
         
         None
