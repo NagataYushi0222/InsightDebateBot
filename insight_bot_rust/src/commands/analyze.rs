@@ -55,7 +55,7 @@ pub async fn handle_start(
     let call = manager.join(guild_id, voice_channel_id).await?;
 
     // Create session
-    let _session = session_manager.create_session(guild_id, command.channel_id, call)?;
+    let _session = session_manager.create_session(guild_id, command.channel_id, call).await?;
     
     // Start analysis loop
     session_manager.start_analysis_loop(guild_id, ctx.http.clone());

@@ -1,0 +1,10 @@
+/Users/osadayuushi/Desktop/Programming/DiscordBOT_surver/insight_bot_rust/target/release/deps/polyval-8895afd53dbd732a.d: /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/polyval-0.6.2/src/lib.rs /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/polyval-0.6.2/src/backend.rs /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/polyval-0.6.2/src/backend/soft64.rs /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/polyval-0.6.2/src/mulx.rs
+
+/Users/osadayuushi/Desktop/Programming/DiscordBOT_surver/insight_bot_rust/target/release/deps/libpolyval-8895afd53dbd732a.rlib: /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/polyval-0.6.2/src/lib.rs /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/polyval-0.6.2/src/backend.rs /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/polyval-0.6.2/src/backend/soft64.rs /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/polyval-0.6.2/src/mulx.rs
+
+/Users/osadayuushi/Desktop/Programming/DiscordBOT_surver/insight_bot_rust/target/release/deps/libpolyval-8895afd53dbd732a.rmeta: /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/polyval-0.6.2/src/lib.rs /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/polyval-0.6.2/src/backend.rs /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/polyval-0.6.2/src/backend/soft64.rs /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/polyval-0.6.2/src/mulx.rs
+
+/Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/polyval-0.6.2/src/lib.rs:
+/Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/polyval-0.6.2/src/backend.rs:
+/Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/polyval-0.6.2/src/backend/soft64.rs:
+/Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/polyval-0.6.2/src/mulx.rs:

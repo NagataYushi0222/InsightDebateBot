@@ -1,0 +1,12 @@
+/Users/osadayuushi/Desktop/Programming/DiscordBOT_surver/insight_bot_rust/target/release/deps/mime_guess-b66ef1eefa5e804d.d: /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mime_guess-2.0.5/src/lib.rs /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mime_guess-2.0.5/src/impl_bin_search.rs /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mime_guess-2.0.5/src/mime_types.rs /Users/osadayuushi/Desktop/Programming/DiscordBOT_surver/insight_bot_rust/target/release/build/mime_guess-046fbe611590d88f/out/mime_types_generated.rs
+
+/Users/osadayuushi/Desktop/Programming/DiscordBOT_surver/insight_bot_rust/target/release/deps/libmime_guess-b66ef1eefa5e804d.rlib: /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mime_guess-2.0.5/src/lib.rs /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mime_guess-2.0.5/src/impl_bin_search.rs /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mime_guess-2.0.5/src/mime_types.rs /Users/osadayuushi/Desktop/Programming/DiscordBOT_surver/insight_bot_rust/target/release/build/mime_guess-046fbe611590d88f/out/mime_types_generated.rs
+
+/Users/osadayuushi/Desktop/Programming/DiscordBOT_surver/insight_bot_rust/target/release/deps/libmime_guess-b66ef1eefa5e804d.rmeta: /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mime_guess-2.0.5/src/lib.rs /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mime_guess-2.0.5/src/impl_bin_search.rs /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mime_guess-2.0.5/src/mime_types.rs /Users/osadayuushi/Desktop/Programming/DiscordBOT_surver/insight_bot_rust/target/release/build/mime_guess-046fbe611590d88f/out/mime_types_generated.rs
+
+/Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mime_guess-2.0.5/src/lib.rs:
+/Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mime_guess-2.0.5/src/impl_bin_search.rs:
+/Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mime_guess-2.0.5/src/mime_types.rs:
+/Users/osadayuushi/Desktop/Programming/DiscordBOT_surver/insight_bot_rust/target/release/build/mime_guess-046fbe611590d88f/out/mime_types_generated.rs:
+
+# env-dep:MIME_TYPES_GENERATED_PATH=/Users/osadayuushi/Desktop/Programming/DiscordBOT_surver/insight_bot_rust/target/release/build/mime_guess-046fbe611590d88f/out/mime_types_generated.rs

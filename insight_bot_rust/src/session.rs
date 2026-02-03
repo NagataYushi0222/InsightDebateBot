@@ -281,7 +281,7 @@ impl SessionManager {
     }
 
     /// Create a new session
-    pub fn create_session(
+    pub async fn create_session(
         &self,
         guild_id: GuildId,
         text_channel_id: ChannelId,
