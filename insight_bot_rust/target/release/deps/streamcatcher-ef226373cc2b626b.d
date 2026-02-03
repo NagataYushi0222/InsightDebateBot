@@ -1,0 +1,10 @@
+/Users/osadayuushi/Desktop/Programming/DiscordBOT_surver/insight_bot_rust/target/release/deps/streamcatcher-ef226373cc2b626b.d: /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/streamcatcher-1.0.1/src/lib.rs /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/streamcatcher-1.0.1/src/loom.rs /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/streamcatcher-1.0.1/src/standard.rs /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/streamcatcher-1.0.1/src/state.rs
+
+/Users/osadayuushi/Desktop/Programming/DiscordBOT_surver/insight_bot_rust/target/release/deps/libstreamcatcher-ef226373cc2b626b.rlib: /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/streamcatcher-1.0.1/src/lib.rs /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/streamcatcher-1.0.1/src/loom.rs /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/streamcatcher-1.0.1/src/standard.rs /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/streamcatcher-1.0.1/src/state.rs
+
+/Users/osadayuushi/Desktop/Programming/DiscordBOT_surver/insight_bot_rust/target/release/deps/libstreamcatcher-ef226373cc2b626b.rmeta: /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/streamcatcher-1.0.1/src/lib.rs /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/streamcatcher-1.0.1/src/loom.rs /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/streamcatcher-1.0.1/src/standard.rs /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/streamcatcher-1.0.1/src/state.rs
+
+/Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/streamcatcher-1.0.1/src/lib.rs:
+/Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/streamcatcher-1.0.1/src/loom.rs:
+/Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/streamcatcher-1.0.1/src/standard.rs:
+/Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/streamcatcher-1.0.1/src/state.rs:

@@ -1,0 +1,9 @@
+/Users/osadayuushi/Desktop/Programming/DiscordBOT_surver/insight_bot_rust/target/debug/deps/patricia_tree-48550faf17952b60.d: /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/patricia_tree-0.8.0/src/lib.rs /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/patricia_tree-0.8.0/src/map.rs /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/patricia_tree-0.8.0/src/set.rs /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/patricia_tree-0.8.0/src/node.rs /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/patricia_tree-0.8.0/src/tree.rs
+
+/Users/osadayuushi/Desktop/Programming/DiscordBOT_surver/insight_bot_rust/target/debug/deps/libpatricia_tree-48550faf17952b60.rmeta: /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/patricia_tree-0.8.0/src/lib.rs /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/patricia_tree-0.8.0/src/map.rs /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/patricia_tree-0.8.0/src/set.rs /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/patricia_tree-0.8.0/src/node.rs /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/patricia_tree-0.8.0/src/tree.rs
+
+/Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/patricia_tree-0.8.0/src/lib.rs:
+/Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/patricia_tree-0.8.0/src/map.rs:
+/Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/patricia_tree-0.8.0/src/set.rs:
+/Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/patricia_tree-0.8.0/src/node.rs:
+/Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/patricia_tree-0.8.0/src/tree.rs:

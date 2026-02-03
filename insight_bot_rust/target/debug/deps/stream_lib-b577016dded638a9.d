@@ -1,0 +1,10 @@
+/Users/osadayuushi/Desktop/Programming/DiscordBOT_surver/insight_bot_rust/target/debug/deps/stream_lib-b577016dded638a9.d: /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/stream_lib-0.4.2/src/lib.rs /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/stream_lib-0.4.2/src/download_stream.rs /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/stream_lib-0.4.2/src/error.rs /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/stream_lib-0.4.2/src/hls/mod.rs /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/stream_lib-0.4.2/src/hls/named_watch.rs /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/stream_lib-0.4.2/src/hls/watch.rs
+
+/Users/osadayuushi/Desktop/Programming/DiscordBOT_surver/insight_bot_rust/target/debug/deps/libstream_lib-b577016dded638a9.rmeta: /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/stream_lib-0.4.2/src/lib.rs /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/stream_lib-0.4.2/src/download_stream.rs /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/stream_lib-0.4.2/src/error.rs /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/stream_lib-0.4.2/src/hls/mod.rs /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/stream_lib-0.4.2/src/hls/named_watch.rs /Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/stream_lib-0.4.2/src/hls/watch.rs
+
+/Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/stream_lib-0.4.2/src/lib.rs:
+/Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/stream_lib-0.4.2/src/download_stream.rs:
+/Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/stream_lib-0.4.2/src/error.rs:
+/Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/stream_lib-0.4.2/src/hls/mod.rs:
+/Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/stream_lib-0.4.2/src/hls/named_watch.rs:
+/Users/osadayuushi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/stream_lib-0.4.2/src/hls/watch.rs:
