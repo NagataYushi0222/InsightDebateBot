@@ -89,20 +89,37 @@ def setup_credentials():
 
 # Load Opus
 if not discord.opus.is_loaded():
-    opus_filename = "libopus.dll" if os.name == 'nt' else "libopus.dylib"
+    opus_filename = ""
+    match sys.platform:
+        case "win32":
+            opus_filename = "libopus.dll"
+        case "darwin":
+            opus_filename = "libopus.dylib"
+        case "linux":
+            opus_filename = "libopus.so"
+
     bundled_opus = resource_path(opus_filename)
     if os.path.exists(bundled_opus):
-         try:
-             discord.opus.load_opus(bundled_opus)
-             print(f"Loaded bundled opus from {bundled_opus}")
-         except Exception as e:
-             print(f"Failed to load bundled opus: {e}")
+        try:
+            discord.opus.load_opus(bundled_opus)
+            print(f"Loaded bundled opus from {bundled_opus}")
+        except Exception as e:
+            print(f"Failed to load bundled opus: {e}")
     else:
         try:
-             if os.name != 'nt':
+            if sys.platform == 'darwin':
                 discord.opus.load_opus("/opt/homebrew/lib/libopus.dylib")
-             else:
+            elif sys.platform == 'win32':
                 discord.opus.load_opus("libopus-0.dll")
+            elif sys.platform == 'linux':
+                import ctypes.util
+
+                lib_name = "opus"
+                lib_path = ctypes.util.find_library(lib_name)
+                if lib_path:
+                    discord.opus.load_opus(lib_path)
+                else:
+                    print("Could not find opus library using ctypes.util.find_library")
         except Exception as e:
             print(f"Could not load opus from default path: {e}")
 
