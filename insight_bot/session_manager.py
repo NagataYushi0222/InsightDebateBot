@@ -28,7 +28,7 @@ class GuildSession:
         # Start periodic task
         self.task = asyncio.create_task(self.process_loop())
 
-    async def stop_recording(self):
+    async def stop_recording(self, skip_final=False):
         # 1. Cancel periodic task first to prevent double execution
         if self.task:
             self.task.cancel()
@@ -38,8 +38,8 @@ class GuildSession:
                 pass
             self.task = None
 
-        # 2. Perform Final Analysis
-        if self.voice_client and self.voice_client.is_connected() and self.active_sink:
+        # 2. Perform Final Analysis (unless skipped)
+        if not skip_final and self.voice_client and self.voice_client.is_connected() and self.active_sink:
             if self.target_text_channel:
                  await self.target_text_channel.send("🔄 終了前の最終分析を行っています...しばらくお待ちください。")
             await self.perform_analysis(is_final=True)
@@ -214,7 +214,7 @@ class SessionManager:
             self.sessions[guild_id] = GuildSession(guild_id, self.bot)
         return self.sessions[guild_id]
 
-    async def cleanup_session(self, guild_id: int):
+    async def cleanup_session(self, guild_id: int, skip_final=False):
         if guild_id in self.sessions:
-            await self.sessions[guild_id].stop_recording()
+            await self.sessions[guild_id].stop_recording(skip_final=skip_final)
             del self.sessions[guild_id]

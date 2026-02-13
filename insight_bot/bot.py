@@ -139,6 +139,30 @@ async def on_ready():
     except Exception as e:
         print(f"Failed to sync commands: {e}")
 
+@bot.event
+async def on_voice_state_update(member, before, after):
+    """Auto-stop when all users leave the voice channel (only bot remains)."""
+    # Only care about users leaving a channel
+    if before.channel is None:
+        return
+    
+    # Check if the bot is in the channel the user left
+    session = session_manager.get_session(member.guild.id)
+    if not session.voice_client or not session.voice_client.is_connected():
+        return
+    
+    if session.voice_client.channel != before.channel:
+        return
+    
+    # Count non-bot members remaining in the channel
+    remaining_members = [m for m in before.channel.members if not m.bot]
+    
+    if len(remaining_members) == 0:
+        print(f"[{member.guild.id}] All users left voice channel. Auto-stopping...")
+        if session.target_text_channel:
+            await session.target_text_channel.send("👋 全員がボイスチャンネルから退出したため、自動的に分析を終了しました。")
+        await session_manager.cleanup_session(member.guild.id, skip_final=True)
+
 # --- Settings Commands ---
 settings_group = bot.create_group("settings", "Botの設定を変更します")
 
@@ -203,19 +227,26 @@ async def analyze_now(ctx):
     else:
         await ctx.respond("分析は実行されていません。先に /analyze_start を実行してください。", ephemeral=True)
 
-@bot.slash_command(name="analyze_stop", description="分析を終了し、ボイスチャットから退出します")
+@bot.slash_command(name="analyze_stop", description="分析を終了します（最終レポートなし）")
 async def analyze_stop(ctx):
     await ctx.defer()
     session = session_manager.get_session(ctx.guild.id)
     
-    if session.active_sink: # Check sink directly or via session method if available
-        await ctx.followup.send("🔄 最終レポートを作成して終了します。しばらくお待ちください...")
-        
-        # Stop recording and cleanup
-        await session.stop_recording()
-        session_manager.cleanup_session(ctx.guild.id)
-        
+    if session.active_sink:
+        await session_manager.cleanup_session(ctx.guild.id, skip_final=True)
         await ctx.followup.send("✅ 分析を終了しました。お疲れ様でした！")
+    else:
+        await ctx.followup.send("分析は実行されていません。")
+
+@bot.slash_command(name="analyze_stop_final", description="最終レポートを作成してから分析を終了します")
+async def analyze_stop_final(ctx):
+    await ctx.defer()
+    session = session_manager.get_session(ctx.guild.id)
+    
+    if session.active_sink:
+        await ctx.followup.send("🔄 最終レポートを作成して終了します。しばらくお待ちください...")
+        await session_manager.cleanup_session(ctx.guild.id, skip_final=False)
+        await ctx.followup.send("✅ 最終レポートを作成し、分析を終了しました。お疲れ様でした！")
     else:
         await ctx.followup.send("分析は実行されていません。")
 
