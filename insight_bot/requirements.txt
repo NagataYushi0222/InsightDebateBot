@@ -1,8 +1,8 @@
-py-cord
+py-cord==2.4.1
 google-genai
 pydub
 python-dotenv
-PyNaCl
+PyNaCl==1.5.0
 setuptools
 wheel
 certifi

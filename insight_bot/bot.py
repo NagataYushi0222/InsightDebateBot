@@ -205,16 +205,19 @@ async def analyze_now(ctx):
 
 @bot.slash_command(name="analyze_stop", description="分析を終了し、ボイスチャットから退出します")
 async def analyze_stop(ctx):
+    await ctx.defer()
     session = session_manager.get_session(ctx.guild.id)
     
-    if session.voice_client and session.voice_client.is_connected():
-        await ctx.respond("🔄 最終レポートを作成して終了します。しばらくお待ちください...")
+    if session.active_sink: # Check sink directly or via session method if available
+        await ctx.followup.send("🔄 最終レポートを作成して終了します。しばらくお待ちください...")
+        
+        # Stop recording and cleanup
         await session.stop_recording()
-        # Clean up session from manager
-        await session_manager.cleanup_session(ctx.guild.id)
+        session_manager.cleanup_session(ctx.guild.id)
+        
         await ctx.followup.send("✅ 分析を終了しました。お疲れ様でした！")
     else:
-        await ctx.respond("分析は実行されていません。", ephemeral=True)
+        await ctx.followup.send("分析は実行されていません。")
 
 def run_bot():
     token = setup_credentials()
