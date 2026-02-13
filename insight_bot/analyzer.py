@@ -87,17 +87,18 @@ def analyze_discussion(audio_files_map, context_history="", user_map=None, api_k
     analyzes the discussion.
     audio_files_map: dict of {user_id: mp3_file_path}
     user_map: dict of {user_id: user_name}
-    api_key: str (Optional) - if passed, use this key. Else use env default.
+    api_key: str (Required) - User's API key.
     mode: str - "debate" or "summary"
     """
     
     # Determine API Key
-    use_key = api_key if api_key else GEMINI_API_KEY
+    use_key = api_key
     if not use_key:
-        return "❌ APIキーが設定されていません。`/settings set_key` で設定してください。"
+        return "❌ APIキーが設定されていません。`/settings set_apikey` で設定してください。"
 
     # Initialize Client with specific key
     try:
+        # Pass the key directly to Client
         client = genai.Client(api_key=use_key)
     except Exception as e:
         return f"❌ APIクライアントの初期化に失敗しました: {e}"
