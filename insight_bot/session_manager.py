@@ -180,7 +180,22 @@ class GuildSession:
                 # Check for analysis errors or empty results
                 if not report or report.startswith("⚠️") or report.startswith("音声データがありません") or report.startswith("❌"):
                      print(f"[{self.guild_id}] Analysis skipped or failed: {report}")
-                     # Optionally notify if it's a critical error, but for "no audio" just skip
+                     
+                     # Notify user about silence or error
+                     msg = ""
+                     if report.startswith("音声データがありません"):
+                         msg = "🎤 音声が検出されませんでした（無音）。"
+                     elif report.startswith("⚠️") or report.startswith("❌"):
+                         msg = f"⚠️ 分析エラー: {report}"
+                     else:
+                         msg = "⚠️ 予期せぬエラーでレポートを作成できませんでした。"
+                     
+                     if self.target_text_channel:
+                         await self.target_text_channel.send(msg)
+                         
+                         # If this was final, ensure we say goodbye even if no report
+                         if is_final:
+                              await self.target_text_channel.send("🛑 セッションを終了します。")
                      return
 
                 # 2. Create Thread and Post Report
