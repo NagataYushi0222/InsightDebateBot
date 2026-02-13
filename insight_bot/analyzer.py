@@ -2,7 +2,7 @@ from google import genai
 from google.genai import types
 import os
 import time
-from .config import GEMINI_API_KEY, GEMINI_MODEL_FLASH
+from .config import GEMINI_MODEL_FLASH
 
 PROMPTS = {
     "debate": """
