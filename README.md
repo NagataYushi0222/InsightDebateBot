@@ -5,96 +5,86 @@ Discord上のボイスチャットを自動録音・分析し、議論の要約�
 ## ✨ 特徴
 - 📹 **ユーザーごとの音声録音**: 各参加者の発言を個別に記録
 - 🤖 **Gemini AIによる分析**: Google Gemini APIで音声を文字起こし・分析・要約
-- 🔍 **ファクトチェック**: Google検索機能で発言内容の正確性を確認（議論モード）
+- � **BYOK (Bring Your Own Key)**: 各ユーザーが自分のAPIキーを設定して利用（Botオーナーの負担なし）
+- �🔍 **ファクトチェック**: Google検索機能で発言内容の正確性を確認
 - 📊 **2つのモード**: 「議論分析（Debate）」と「会議要約（Summary）」を選択可能
-- 💰 **完全無料**: サーバー代・API利用料は各自負担（BYOKモデル）
-- 🐳 **Docker対応**: 簡単に自鯖でホスト可能
+-  **Docker対応**: 簡単に自鯖でホスト可能
 
 ---
 
-## 🚀 クイックスタート（アプリ版）
+## 🚀 クイックスタート（ユーザー向け）
 
-プログラミング知識不要で、Windows/Mac上でダブルクリックで動かせます。
+Botが導入されたサーバーでの使い方は以下の通りです。
 
-### 1. 準備する
-1. **Discord Bot Token**: [Developer Portal](https://discord.com/developers/applications)から取得（詳細は[こちら](https://github.com/reactiflux/discord-irc/wiki/Creating-a-discord-bot-&-getting-a-token)）
-2. **Gemini API Key**: [Google AI Studio](https://aistudio.google.com/app/apikey)から取得
+### 1. APIキーの設定（初回のみ）
+Botを使用する各ユーザーは、自分のGemini APIキーを登録する必要があります。
+（[Google AI Studio](https://aistudio.google.com/app/apikey) から無料で取得可能です）
 
-### 2. 起動する
-1. [Releasesページ](https://github.com/NagataYushi0222/InsightDebateBot/releases)から最新のアプリをダウンロード
-2. 起動すると、ターミナル（黒い画面）が開きます
-3. 画面の指示に従い、用意したTokenとAPI Keyを貼り付けます（初回のみ）
-4. ✅ バリデーションに成功すると、設定が保存されBotが起動します
+Discord上で以下のコマンドを実行してください：
+```
+/settings set_apikey [あなたのAPIキー]
+```
+※キーは暗号化されて保存され、他のユーザーからは見えません。一度設定すれば次回以降は自動で使用されます。
+
+### 2. 分析の開始
+ボイスチャットに参加した状態で、以下のコマンドを実行します：
+```
+/analyze_start
+```
 
 ---
 
-## 🐳 クイックスタート（Docker版）
+## � サーバー管理者向けセットアップ
 
-VPSや自宅サーバーで24時間稼働させるのに最適です。
+### Dockerでの起動方法
 
-### 1. セットアップ（初回のみ）
+1. リポジトリをクローン
 ```bash
 git clone https://github.com/NagataYushi0222/InsightDebateBot.git
 cd InsightDebateBot
+```
 
-# 対話モードで設定を開始
+2. Botトークンの設定
+初回起動時にBotトークンの入力を求められるので、対話モードで設定します。
+```bash
 docker compose run --rm bot
 ```
-上記のコマンドを実行すると、ターミナル上でトークンとAPIキーの入力を求められます。
-入力内容はローカルの `.env` ファイルに保存されます。
+※ `GEMINI_API_KEY` の入力は不要になりました（ユーザーごとに設定するため）。
 
-### 2. 本番起動
+3. 本番起動
 ```bash
 docker compose up -d
 ```
-バックグラウンドで起動します。
 
-### 💡 Hint: コマンドの反映を早くする
-Discordのコマンド登録には時間がかかることがあります（最大1時間）。
-即座に反映させたい場合は、`.env` ファイルを開き、`GUILD_ID=あなたのサーバーID` を追記して再起動してください。
+### 環境変数 (.env)
+- `DISCORD_TOKEN`: Botのトークン
+- `GUILD_ID`: (任意) コマンド反映を高速化するためのサーバーID
 
 ---
 
-## 🎮 使い方（コマンド一覧）
+## 🎮 コマンド一覧
 
 ### 📊 メイン機能
 | コマンド | 説明 |
 | --- | --- |
-| `/analyze_start` | VCの録音・分析を開始します |
+| `/analyze_start` | VCの録音・分析を開始します（要APIキー登録） |
 | `/analyze_stop` | 分析を終了し、最後のレポートを出力してから退出します |
-| `/analyze_now` | **(New)** 定期レポートを待たずに、今すぐ分析を実行します |
+| `/analyze_now` | 定期レポートを待たずに、今すぐ分析を実行します |
 
 ### ⚙️ 設定変更
 | コマンド | 説明 |
 | --- | --- |
+| `/settings set_apikey` | **(重要)** あなた専用のGemini APIキーを登録します |
 | `/settings set_mode` | 分析モードを切替 (`debate`: 議論重視 / `summary`: 要約重視) |
 | `/settings set_interval` | レポート間隔を変更（秒単位、デフォルト300秒） |
 
 ---
 
-## 🛠 開発者向け情報
-
-### ソースコードから実行
-```bash
-# 1. Clone
-git clone https://github.com/NagataYushi0222/InsightDebateBot.git
-cd InsightDebateBot
-
-# 2. Install Dependencies
-pip install -r insight_bot/requirements.txt
-
-# 3. Run
-python main.py
-```
-
-### 技術スタック
+## 技術スタック
 - **Language**: Python 3.10+
 - **Framework**: py-cord (Discord API)
-- **AI Model**: Google Gemini 1.5 Flash (via `google-genai` SDK)
-- **Audio Processing**: ffmpeg
-
-## コントリビューション
-Pull Request は大歓迎です！機能追加、バグ修正、翻訳などお気軽にどうぞ。
+- **AI Model**: Google Gemini 1.5 Flash / 2.0 Flash (via `google-genai` SDK)
+- **Database**: SQLite (ユーザー設定・APIキー保存)
 
 ## ライセンス
 [MIT License](LICENSE)
