@@ -53,9 +53,19 @@ test_models = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-flash-latest", "g
 for model_name in test_models:
     print(f"Testing {model_name}...", end=" ")
     try:
+        # Replicate analyzer.py config
+        tool_config = types.Tool(
+            google_search=types.GoogleSearch()
+        )
+        generate_config = types.GenerateContentConfig(
+            tools=[tool_config],
+            response_modalities=["TEXT"]
+        )
+        
         response = client.models.generate_content(
             model=model_name,
-            contents="Hello, ignore this."
+            contents="Hello, ignore this.",
+            config=generate_config
         )
         print("OK ✅")
     except Exception as e:
