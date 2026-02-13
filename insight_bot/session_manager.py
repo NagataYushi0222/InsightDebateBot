@@ -142,7 +142,10 @@ class GuildSession:
 
             # Thread Setup
             import datetime
-            timestamp_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+            # JST is UTC+9
+            jst_delta = datetime.timedelta(hours=9)
+            now_jst = datetime.datetime.now(datetime.timezone.utc) + jst_delta
+            timestamp_str = now_jst.strftime("%Y-%m-%d %H:%M")
             
             if is_final:
                 thread_name = f"議論分析レポート (最終) {timestamp_str}"
