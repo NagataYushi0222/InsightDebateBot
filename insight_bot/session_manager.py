@@ -155,6 +155,35 @@ class GuildSession:
                 header_prefix = "📊 **議論分析レポート**"
             
             try:
+                # 1. Analyze first (Heavy processing)
+                if self.target_text_channel:
+                    # Optional: Typing indicator in the main channel while analyzing
+                    async with self.target_text_channel.typing():
+                        loop = asyncio.get_running_loop()
+                        
+                        api_key = os.getenv("GEMINI_API_KEY")
+                        if not api_key:
+                            if self.target_text_channel:
+                                await self.target_text_channel.send("⚠️ エラー: APIキーが設定されていません。起動設定を確認してください。")
+                            return
+                        
+                        report = await loop.run_in_executor(
+                            None, 
+                            analyze_discussion, 
+                            user_files_mp3, 
+                            self.last_context, 
+                            user_map,
+                            api_key,
+                            self.settings['analysis_mode']
+                        )
+                
+                # Check for analysis errors or empty results
+                if not report or report.startswith("⚠️") or report.startswith("音声データがありません") or report.startswith("❌"):
+                     print(f"[{self.guild_id}] Analysis skipped or failed: {report}")
+                     # Optionally notify if it's a critical error, but for "no audio" just skip
+                     return
+
+                # 2. Create Thread and Post Report
                 starter_msg_text = f"📅 **自動分析** ({timestamp_str})"
                 if is_final:
                     starter_msg_text = f"🛑 **セッション終了** ({timestamp_str})"
@@ -162,27 +191,6 @@ class GuildSession:
                 if self.target_text_channel:
                     starter_msg = await self.target_text_channel.send(starter_msg_text)
                     report_thread = await starter_msg.create_thread(name=thread_name, auto_archive_duration=60)
-                    
-                    await report_thread.send(f"🔄 音声ファイルを分析中... (Mode: {self.settings['analysis_mode']})")
-                    
-                    # Analyze in executor
-                    loop = asyncio.get_running_loop()
-                    
-                    api_key = os.getenv("GEMINI_API_KEY")
-                    if not api_key:
-                        if self.target_text_channel:
-                            await self.target_text_channel.send("⚠️ エラー: APIキーが設定されていません。起動設定を確認してください。")
-                        return
-
-                    report = await loop.run_in_executor(
-                        None, 
-                        analyze_discussion, 
-                        user_files_mp3, 
-                        self.last_context, 
-                        user_map,
-                        api_key,
-                        self.settings['analysis_mode']
-                    )
                     
                     # Update Context
                     self.last_context = report[-2000:]
