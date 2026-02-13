@@ -8,11 +8,12 @@ import google.genai as genai_sdk # Rename to avoid conflict if any, though actua
 from google import genai
 
 from .config import DISCORD_TOKEN, GUILD_ID
-from .database import init_db, update_guild_setting, get_guild_settings
+from .database import init_db, update_guild_setting, get_guild_settings, init_user_db, set_user_key, get_user_key
 from .session_manager import SessionManager
 
 # Initialize Database
 init_db()
+init_user_db()
 
 intents = discord.Intents.default()
 intents.voice_states = True
@@ -183,10 +184,27 @@ async def set_interval(ctx, seconds: int):
     update_guild_setting(ctx.guild.id, 'recording_interval', seconds)
     await ctx.respond(f"✅ 分析間隔を {seconds}秒 ({seconds/60:.1f}分) に変更しました。")
 
+@settings_group.command(name="set_apikey", description="Gemini APIキーを設定・更新します（あなた専用のキーとして保存されます）")
+async def set_apikey(ctx, api_key: str):
+    # Basic validation
+    if not api_key.startswith("AIza"):
+        await ctx.respond("❌ 無効なAPIキーの形式です。正しいキーを入力してください。", ephemeral=True)
+        return
+        
+    set_user_key(ctx.author.id, api_key)
+    await ctx.respond("✅ APIキーを保存しました！\n以後、あなたがコマンドを実行するとこのキーが自動で使用されます。", ephemeral=True)
+
+
 # --- Analysis Commands ---
 
 @bot.slash_command(name="analyze_start", description="ボイスチャットの分析を開始します")
 async def analyze_start(ctx):
+    # Check if user has an API Key
+    user_key = get_user_key(ctx.author.id)
+    if not user_key:
+        await ctx.respond("❌ **APIキーが設定されていません**。\n`/settings set_apikey [あなたのキー]` で一度だけ登録してください。", ephemeral=True)
+        return
+
     voice_state = ctx.author.voice
     if not voice_state or not voice_state.channel:
         await ctx.respond("ボイスチャットに参加してからコマンドを実行してください。", ephemeral=True)
@@ -208,8 +226,8 @@ async def analyze_start(ctx):
         voice_client = await channel.connect()
         await ctx.respond(f"{channel.name} の分析を開始しました。プライバシー保護のため、録音・分析が行われることを参加者に周知してください。")
         
-        # Start Recording via Session
-        await session.start_recording(voice_client, ctx.channel)
+        # Start Recording via Session (Pass API Key)
+        await session.start_recording(voice_client, ctx.channel, api_key=user_key)
             
     except Exception as e:
         # Cleanup if connection failed

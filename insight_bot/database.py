@@ -51,3 +51,34 @@ def update_guild_setting(guild_id, key, value):
     ''', (guild_id, settings['api_key'], settings['analysis_mode'], settings['recording_interval']))
     conn.commit()
     conn.close()
+
+def init_user_db():
+    conn = get_connection()
+    c = conn.cursor()
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS user_keys (
+            user_id INTEGER PRIMARY KEY,
+            api_key TEXT,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    conn.commit()
+    conn.close()
+
+def get_user_key(user_id):
+    conn = get_connection()
+    c = conn.cursor()
+    c.execute('SELECT api_key FROM user_keys WHERE user_id = ?', (user_id,))
+    row = c.fetchone()
+    conn.close()
+    return row['api_key'] if row else None
+
+def set_user_key(user_id, api_key):
+    conn = get_connection()
+    c = conn.cursor()
+    c.execute('''
+        INSERT OR REPLACE INTO user_keys (user_id, api_key, updated_at)
+        VALUES (?, ?, CURRENT_TIMESTAMP)
+    ''', (user_id, api_key))
+    conn.commit()
+    conn.close()

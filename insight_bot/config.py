@@ -4,7 +4,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
-GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
+# GEMINI_API_KEY is now per-user, managed via /set_apikey
+# GEMINI_API_KEY = os.getenv('GEMINI_API_KEY') 
 GUILD_ID = os.getenv('GUILD_ID')
 
 # Audio settings

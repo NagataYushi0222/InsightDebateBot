@@ -19,14 +19,18 @@ class GuildSession:
         self.task: Optional[asyncio.Task] = None
         self.settings = get_guild_settings(guild_id)
 
-    async def start_recording(self, voice_client, channel):
+    async def start_recording(self, voice_client, channel, api_key=None):
         self.voice_client = voice_client
         self.target_text_channel = channel
         self.active_sink = UserSpecificSink()
+        self.api_key = api_key # Store the key
         self.voice_client.start_recording(self.active_sink, self.finished_callback)
         
         # Start periodic task
         self.task = asyncio.create_task(self.process_loop())
+
+    # Removed corrupted block
+
 
     async def stop_recording(self, skip_final=False):
         # 1. Cancel periodic task first to prevent double execution
@@ -161,10 +165,10 @@ class GuildSession:
                     async with self.target_text_channel.typing():
                         loop = asyncio.get_running_loop()
                         
-                        api_key = os.getenv("GEMINI_API_KEY")
+                        api_key = self.api_key
                         if not api_key:
                             if self.target_text_channel:
-                                await self.target_text_channel.send("⚠️ エラー: APIキーが設定されていません。起動設定を確認してください。")
+                                await self.target_text_channel.send("⚠️ エラー: APIキーが設定されていません。")
                             return
                         
                         report = await loop.run_in_executor(
