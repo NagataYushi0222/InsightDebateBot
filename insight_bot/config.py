@@ -13,8 +13,8 @@ SAMPLE_RATE = 48000
 CHANNELS = 2
 
 # Models
-GEMINI_MODEL_FLASH = "gemini-flash-latest"
-GEMINI_MODEL_PRO = "gemini-pro-latest"
+GEMINI_MODEL_FLASH = "gemini-3-flash-preview"
+GEMINI_MODEL_PRO = "gemini-3-pro-preview"
 
 # Paths
 TEMP_AUDIO_DIR = "temp_audio"
