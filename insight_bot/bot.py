@@ -143,6 +143,15 @@ async def on_ready():
 @bot.event
 async def on_voice_state_update(member, before, after):
     """Auto-stop when all users leave the voice channel (only bot remains)."""
+    # 1. Check if the BOT itself disconnected or moved
+    if member.id == bot.user.id:
+        # If bot left the channel (after.channel is None)
+        if after.channel is None:
+             print(f"[{member.guild.id}] Bot disconnected from voice. Cleaning up session...")
+             await session_manager.cleanup_session(member.guild.id, skip_final=True)
+        return
+
+    # 2. Check for users leaving
     # Only care about users leaving a channel
     if before.channel is None:
         return
@@ -160,8 +169,13 @@ async def on_voice_state_update(member, before, after):
     
     if len(remaining_members) == 0:
         print(f"[{member.guild.id}] All users left voice channel. Auto-stopping...")
-        if session.target_text_channel:
-            await session.target_text_channel.send("👋 全員がボイスチャンネルから退出したため、自動的に分析を終了しました。")
+        # Try to notify if possible
+        session = session_manager.get_session(member.guild.id)
+        if session and session.target_text_channel:
+            try:
+                await session.target_text_channel.send("👋 全員がボイスチャンネルから退出したため、自動的に分析を終了しました。")
+            except:
+                pass
         await session_manager.cleanup_session(member.guild.id, skip_final=True)
 
 # --- Settings Commands ---
