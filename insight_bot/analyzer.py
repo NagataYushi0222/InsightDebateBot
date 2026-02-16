@@ -178,7 +178,7 @@ def analyze_discussion(audio_files_map, context_history="", user_map=None, api_k
             except:
                 pass
             
-        return response.text
+        return response.text + f"\n\n(Model: {GEMINI_MODEL_DEFAULT})"
 
     except Exception as e:
         print(f"Analysis Error: {e}")
