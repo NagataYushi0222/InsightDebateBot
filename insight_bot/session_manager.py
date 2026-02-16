@@ -135,12 +135,14 @@ class GuildSession:
                 else:
                     user_map[user_id] = f"User_{user_id}"
 
-            # Convert
+            # Convert in Executor to avoid blocking event loop
+            loop = asyncio.get_running_loop()
             user_files_mp3 = {}
             files_to_cleanup = []
             
             for user_id, raw_path in user_files_raw.items():
-                mp3_path = convert_to_mp3(raw_path)
+                # Run ffmpeg conversion in thread
+                mp3_path = await loop.run_in_executor(None, convert_to_mp3, raw_path)
                 if mp3_path:
                     user_files_mp3[user_id] = mp3_path
                     files_to_cleanup.append(raw_path)
@@ -169,7 +171,7 @@ class GuildSession:
                 if self.target_text_channel:
                     # Optional: Typing indicator in the main channel while analyzing
                     async with self.target_text_channel.typing():
-                        loop = asyncio.get_running_loop()
+
                         
                         api_key = self.api_key
                         if not api_key:
