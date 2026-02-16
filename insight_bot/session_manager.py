@@ -49,6 +49,12 @@ class GuildSession:
             await self.perform_analysis(is_final=True)
 
         # 3. Stop recording and disconnect
+        # Try to get voice client from bot/guild if not tracked in session
+        if not self.voice_client:
+            guild = self.bot.get_guild(self.guild_id)
+            if guild:
+                self.voice_client = guild.voice_client
+
         if self.voice_client:
             if self.voice_client.recording:
                 self.voice_client.stop_recording()

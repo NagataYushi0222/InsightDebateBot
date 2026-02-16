@@ -148,11 +148,11 @@ async def on_voice_state_update(member, before, after):
         return
     
     # Check if the bot is in the channel the user left
-    session = session_manager.get_session(member.guild.id)
-    if not session.voice_client or not session.voice_client.is_connected():
+    voice_client = member.guild.voice_client
+    if not voice_client or not voice_client.is_connected():
         return
     
-    if session.voice_client.channel != before.channel:
+    if voice_client.channel != before.channel:
         return
     
     # Count non-bot members remaining in the channel
@@ -250,8 +250,15 @@ async def analyze_stop(ctx):
     await ctx.defer()
     session = session_manager.get_session(ctx.guild.id)
     
-    if session.active_sink:
+    # Check actual voice state from Discord
+    voice_client = ctx.guild.voice_client
+
+    if session.active_sink or (voice_client and voice_client.is_connected()):
         await session_manager.cleanup_session(ctx.guild.id, skip_final=True)
+        # Fallback: Force disconnect if cleanup didn't catch it
+        if voice_client and voice_client.is_connected():
+             await voice_client.disconnect()
+        
         await ctx.followup.send("✅ 分析を終了しました。お疲れ様でした！")
     else:
         await ctx.followup.send("分析は実行されていません。")
@@ -261,9 +268,14 @@ async def analyze_stop_final(ctx):
     await ctx.defer()
     session = session_manager.get_session(ctx.guild.id)
     
-    if session.active_sink:
+    voice_client = ctx.guild.voice_client
+
+    if session.active_sink or (voice_client and voice_client.is_connected()):
         await ctx.followup.send("🔄 最終レポートを作成して終了します。しばらくお待ちください...")
         await session_manager.cleanup_session(ctx.guild.id, skip_final=False)
+        # Fallback
+        if voice_client and voice_client.is_connected():
+            await voice_client.disconnect()
         await ctx.followup.send("✅ 最終レポートを作成し、分析を終了しました。お疲れ様でした！")
     else:
         await ctx.followup.send("分析は実行されていません。")

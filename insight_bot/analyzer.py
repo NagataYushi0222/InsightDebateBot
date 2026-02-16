@@ -2,7 +2,7 @@ from google import genai
 from google.genai import types
 import os
 import time
-from .config import GEMINI_MODEL_FLASH
+from .config import GEMINI_MODEL_DEFAULT
 
 PROMPTS = {
     "debate": """
@@ -166,7 +166,7 @@ def analyze_discussion(audio_files_map, context_history="", user_map=None, api_k
         )
         
         response = client.models.generate_content(
-            model=GEMINI_MODEL_FLASH,
+            model=GEMINI_MODEL_DEFAULT,
             contents=contents,
             config=generate_config
         )
