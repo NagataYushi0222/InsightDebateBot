@@ -165,27 +165,11 @@ def analyze_discussion(audio_files_map, context_history="", user_map=None, api_k
             response_modalities=["TEXT"] # Ensure text output
         )
         
-        # Retry logic for 503 errors
-        max_retries = 3
-        retry_delay = 2
-        
-        for attempt in range(max_retries):
-            try:
-                response = client.models.generate_content(
-                    model=GEMINI_MODEL_DEFAULT,
-                    contents=contents,
-                    config=generate_config
-                )
-                break # Success
-            except Exception as e:
-                # Check for 503 or 429 (Resource Exhausted can sometimes be retried if short)
-                if "503" in str(e) or "The model is currently experiencing high demand" in str(e):
-                    if attempt < max_retries - 1:
-                        print(f"Gemini 503 Error (Attempt {attempt+1}/{max_retries}). Retrying in {retry_delay}s...")
-                        time.sleep(retry_delay)
-                        retry_delay *= 2 # Exponential backoff
-                        continue
-                raise e # Re-raise if not 503 or retries exhausted
+        response = client.models.generate_content(
+            model=GEMINI_MODEL_DEFAULT,
+            contents=contents,
+            config=generate_config
+        )
         
         # Clean up files
         for f in uploaded_files:

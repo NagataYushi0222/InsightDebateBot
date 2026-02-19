@@ -211,12 +211,26 @@ class GuildSession:
                      return
 
                 # 2. Create Thread and Post Report
-                starter_msg_text = f"📅 **自動分析** ({timestamp_str})"
+                title_text = f"📅 自動分析 ({timestamp_str})"
+                embed_color = discord.Color.blue()
                 if is_final:
-                    starter_msg_text = f"🛑 **セッション終了** ({timestamp_str})"
+                    title_text = f"🛑 セッション終了 ({timestamp_str})"
+                    embed_color = discord.Color.red()
+                
+                # レポートのプレビューを作成 (最初の約300文字)
+                preview_length = 300
+                preview_text = report[:preview_length].strip()
+                if len(report) > preview_length:
+                    preview_text += "...\n\n"
+                
+                embed = discord.Embed(
+                    title=title_text,
+                    description=f"{preview_text}\n*(全文はスレッドを開いてご確認ください)*",
+                    color=embed_color
+                )
 
                 if self.target_text_channel:
-                    starter_msg = await self.target_text_channel.send(starter_msg_text)
+                    starter_msg = await self.target_text_channel.send(embed=embed)
                     report_thread = await starter_msg.create_thread(name=thread_name, auto_archive_duration=60)
                     
                     # Update Context

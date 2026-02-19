@@ -37,3 +37,4 @@ temp_audio/
 
 # macOS
 .DS_Store
+*.db
