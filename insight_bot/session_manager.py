@@ -128,7 +128,13 @@ class GuildSession:
                     lines = content.split('\n')
                     new_lines = [line for line in lines if "⏳ 次のレポート出力まで:" not in line]
                     new_content = '\n'.join(new_lines).strip()
-                    await self.countdown_message.edit(content=new_content)
+                    
+                    if not new_content:
+                        # If the message only contained the countdown, delete it entirely
+                        await self.countdown_message.delete()
+                    else:
+                        # Otherwise, edit it to remove the countdown line
+                        await self.countdown_message.edit(content=new_content)
                 except discord.NotFound:
                     pass
                 except Exception as e:
