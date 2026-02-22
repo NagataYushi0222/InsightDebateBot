@@ -187,7 +187,7 @@ async def set_mode(ctx, mode: str):
         await ctx.respond("❌ モードは 'debate' または 'summary' を指定してください。", ephemeral=True)
         return
     update_guild_setting(ctx.guild.id, 'analysis_mode', mode)
-    await ctx.respond(f"✅ 分析モードを '{mode}' に変更しました。")
+    await ctx.respond(f"✅ 分析モードを '{mode}' に変更しました。", ephemeral=True)
 
 @settings_group.command(name="set_interval", description="分析間隔（秒）を変更します")
 async def set_interval(ctx, seconds: int):
@@ -196,7 +196,7 @@ async def set_interval(ctx, seconds: int):
          await ctx.respond("❌ 間隔は最短60秒です。", ephemeral=True)
          return
     update_guild_setting(ctx.guild.id, 'recording_interval', seconds)
-    await ctx.respond(f"✅ 分析間隔を {seconds}秒 ({seconds/60:.1f}分) に変更しました。")
+    await ctx.respond(f"✅ 分析間隔を {seconds}秒 ({seconds/60:.1f}分) に変更しました。", ephemeral=True)
 
 @settings_group.command(name="set_apikey", description="Gemini APIキーを設定・更新します（あなた専用のキーとして保存されます）")
 async def set_apikey(ctx, api_key: str):
@@ -238,13 +238,31 @@ async def analyze_start(ctx):
     try:
         channel = voice_state.channel
         voice_client = await channel.connect()
-        await ctx.respond(f"{channel.name} の分析を開始しました。プライバシー保護のため、録音・分析が行われることを参加者に周知してください。")
         
-        # Start Recording via Session (Pass API Key)
-        await session.start_recording(voice_client, ctx.channel, api_key=user_key)
+        # Get Current Settings
+        settings = get_guild_settings(ctx.guild.id)
+        mode = settings.get('analysis_mode', 'debate')
+        interval = settings.get('recording_interval', 300)
+        interval_mins = interval // 60
+        
+        msg_text = (
+            f"👥｜**{channel.name}** の分析を開始しました。\n"
+            f"プライバシー保護のため、録音・分析が行われることを参加者に周知してください。\n"
+            f"`[設定] 間隔: {interval_mins}分 / モード: {mode}`\n\n"
+            f"⏳ 次のレポート出力まで: 約 {interval_mins}分"
+        )
+        await ctx.followup.send(msg_text)
+        
+        # Get the sent message object so we can edit it later
+        initial_message = await ctx.interaction.original_response()
+        
+        # Start Recording via Session (Pass API Key and Initial Message)
+        await session.start_recording(voice_client, ctx.channel, api_key=user_key, initial_message=initial_message)
             
     except Exception as e:
         # Cleanup if connection failed
+        import traceback
+        traceback.print_exc()
         if session.voice_client:
              await session.stop_recording()
         await ctx.followup.send(f"エラーが発生しました: {e}")

@@ -19,11 +19,12 @@ class GuildSession:
         self.task: Optional[asyncio.Task] = None
         self.settings = get_guild_settings(guild_id)
 
-    async def start_recording(self, voice_client, channel, api_key=None):
+    async def start_recording(self, voice_client, channel, api_key=None, initial_message=None):
         self.voice_client = voice_client
         self.target_text_channel = channel
         self.active_sink = UserSpecificSink()
         self.api_key = api_key # Store the key
+        self.countdown_message = initial_message
         self.voice_client.start_recording(self.active_sink, self.finished_callback)
         
         # Start periodic task
@@ -78,13 +79,55 @@ class GuildSession:
             # Dynamic interval from settings
             self.settings = get_guild_settings(self.guild_id)
             interval = self.settings.get('recording_interval', 300)
+            remaining_seconds = interval
             
-            try:
-                await asyncio.sleep(interval)
-            except asyncio.CancelledError:
-                break
+            # Loop for countdown
+            while remaining_seconds > 0:
+                try:
+                    # Determine sleep time (up to 60 seconds)
+                    sleep_time = min(60, remaining_seconds)
+                    await asyncio.sleep(sleep_time)
+                    remaining_seconds -= sleep_time
+                    
+                    # Edit the countdown message
+                    if self.countdown_message and remaining_seconds > 0:
+                        try:
+                            remaining_minutes = max(1, remaining_seconds // 60)
+                            
+                            # Keep the original content but update the countdown line
+                            # We replace the last line or append if missing
+                            content = self.countdown_message.content
+                            
+                            # Replace the last line using simple substring logic assumes specific format
+                            lines = content.split('\n')
+                            new_lines = []
+                            for line in lines:
+                                if "⏳ 次のレポート出力まで:" not in line:
+                                    new_lines.append(line)
+                                    
+                            new_lines.append(f"⏳ 次のレポート出力まで: 約 {remaining_minutes}分")
+                            new_content = '\n'.join(new_lines)
+                            
+                            await self.countdown_message.edit(content=new_content)
+                        except discord.NotFound:
+                            # Message was probably deleted by a user, ignore
+                            self.countdown_message = None
+                        except Exception as e:
+                            print(f"[{self.guild_id}] Failed to edit countdown message: {e}")
+                            
+                except asyncio.CancelledError:
+                    return
 
+            # Perform the analysis when interval passes
             await self.perform_analysis(is_final=False)
+            
+            # After analysis, post a new countdown message for the next cycle
+            if self.target_text_channel:
+                try:
+                    interval_mins = interval // 60
+                    self.countdown_message = await self.target_text_channel.send(f"⏳ 次のレポート出力まで: 約 {interval_mins}分")
+                except Exception as e:
+                     print(f"[{self.guild_id}] Failed to send new countdown message: {e}")
 
     async def force_analysis(self):
         """Manually trigger an analysis right now."""
