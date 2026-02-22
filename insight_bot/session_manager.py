@@ -118,19 +118,23 @@ class GuildSession:
                 except asyncio.CancelledError:
                     return
 
-            # Before performing analysis, delete the old countdown message
+            # Wait for analysis to complete
+            await self.perform_analysis(is_final=False)
+            
+            # After analysis is complete (report or error message posted), remove the countdown line from the old message
             if self.countdown_message:
                 try:
-                    await self.countdown_message.delete()
+                    content = self.countdown_message.content
+                    lines = content.split('\n')
+                    new_lines = [line for line in lines if "⏳ 次のレポート出力まで:" not in line]
+                    new_content = '\n'.join(new_lines).strip()
+                    await self.countdown_message.edit(content=new_content)
                 except discord.NotFound:
                     pass
                 except Exception as e:
-                    print(f"[{self.guild_id}] Failed to delete countdown message: {e}")
+                    print(f"[{self.guild_id}] Failed to remove countdown text: {e}")
                 finally:
                     self.countdown_message = None
-
-            # Perform the analysis when interval passes
-            await self.perform_analysis(is_final=False)
             
             # After analysis, post a new countdown message for the next cycle
             if self.target_text_channel:
