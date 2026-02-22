@@ -118,6 +118,17 @@ class GuildSession:
                 except asyncio.CancelledError:
                     return
 
+            # Before performing analysis, delete the old countdown message
+            if self.countdown_message:
+                try:
+                    await self.countdown_message.delete()
+                except discord.NotFound:
+                    pass
+                except Exception as e:
+                    print(f"[{self.guild_id}] Failed to delete countdown message: {e}")
+                finally:
+                    self.countdown_message = None
+
             # Perform the analysis when interval passes
             await self.perform_analysis(is_final=False)
             
