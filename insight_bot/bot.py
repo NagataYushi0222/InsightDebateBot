@@ -251,10 +251,7 @@ async def analyze_start(ctx):
             f"`[設定] 間隔: {interval_mins}分 / モード: {mode}`\n\n"
             f"⏳ 次のレポート出力まで: 約 {interval_mins}分"
         )
-        await ctx.followup.send(msg_text)
-        
-        # Get the sent message object so we can edit it later
-        initial_message = await ctx.interaction.original_response()
+        initial_message = await ctx.followup.send(msg_text)
         
         # Start Recording via Session (Pass API Key and Initial Message)
         await session.start_recording(voice_client, ctx.channel, api_key=user_key, initial_message=initial_message)
