@@ -14,8 +14,8 @@ SAMPLE_RATE = 48000
 CHANNELS = 2
 
 # Models
-GEMINI_MODEL_FLASH = "gemini-3-flash-preview"
-GEMINI_MODEL_PRO = "gemini-3-pro-preview"
+GEMINI_MODEL_FLASH = "gemini-2.5-flash"
+GEMINI_MODEL_PRO = "gemini-2.5-pro"
 GEMINI_MODEL_DEFAULT = GEMINI_MODEL_FLASH
 
 # Paths
