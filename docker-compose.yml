@@ -6,6 +6,7 @@ services:
     image: insightdebate-bot:latest
     container_name: insightdebate-bot
     restart: unless-stopped
+    network_mode: "host"
 
     # 環境変数（.envファイルから読み込み、または直接指定）
     environment:
