@@ -237,7 +237,29 @@ async def analyze_start(ctx):
     # Join Voice Channel
     try:
         channel = voice_state.channel
-        voice_client = await channel.connect()
+        voice_client = ctx.guild.voice_client
+        
+        if voice_client:
+            if not voice_client.is_connected():
+                # Clean up dirty state and reconnect
+                await voice_client.disconnect(force=True)
+                voice_client = await channel.connect()
+            elif voice_client.channel.id != channel.id:
+                await voice_client.move_to(channel)
+        else:
+            voice_client = await channel.connect()
+            
+        # Ensure fully connected (workaround for Pycord silent connection failures)
+        import asyncio
+        for _ in range(20): # Wait up to 10 seconds
+            if voice_client.is_connected():
+                break
+            await asyncio.sleep(0.5)
+            
+        if not voice_client.is_connected():
+            # Force disconnect to avoid ghost connections
+            await voice_client.disconnect(force=True)
+            raise Exception("Discordの音声サーバーに接続できませんでした。ボイスチャンネルの接続権限やネットワークの制限を確認してください。")
         
         # Get Current Settings
         settings = get_guild_settings(ctx.guild.id)
