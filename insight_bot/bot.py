@@ -100,21 +100,28 @@ if not discord.opus.is_loaded():
             opus_filename = "libopus.so"
 
     bundled_opus = resource_path(opus_filename)
+    loaded = False
     if os.path.exists(bundled_opus):
         try:
             discord.opus.load_opus(bundled_opus)
             print(f"Loaded bundled opus from {bundled_opus}")
+            loaded = True
         except Exception as e:
             print(f"Failed to load bundled opus: {e}")
-    else:
+            
+    if not loaded:
+        print("Attempting to load opus from system libraries...")
         try:
             if sys.platform == 'darwin':
-                discord.opus.load_opus("/opt/homebrew/lib/libopus.dylib")
+                # Try brew paths
+                try:
+                    discord.opus.load_opus("/opt/homebrew/lib/libopus.dylib")
+                except:
+                    discord.opus.load_opus("/usr/local/lib/libopus.dylib")
             elif sys.platform == 'win32':
                 discord.opus.load_opus("libopus-0.dll")
             elif sys.platform == 'linux':
                 import ctypes.util
-
                 lib_name = "opus"
                 lib_path = ctypes.util.find_library(lib_name)
                 if lib_path:
@@ -243,11 +250,19 @@ async def analyze_start(ctx):
             if not voice_client.is_connected():
                 # Clean up dirty state and reconnect
                 await voice_client.disconnect(force=True)
-                voice_client = await channel.connect()
+                import asyncio
+                try:
+                    voice_client = await asyncio.wait_for(channel.connect(timeout=5.0), timeout=15.0)
+                except asyncio.TimeoutError:
+                    raise Exception("音声サーバーへの接続がタイムアウトしました（UDP通信がブロックされている可能性があります）。ネットワーク環境やファイアウォールの設定を確認してください。")
             elif voice_client.channel.id != channel.id:
                 await voice_client.move_to(channel)
         else:
-            voice_client = await channel.connect()
+            import asyncio
+            try:
+                voice_client = await asyncio.wait_for(channel.connect(timeout=5.0), timeout=15.0)
+            except asyncio.TimeoutError:
+                raise Exception("音声サーバーへの接続がタイムアウトしました（UDP通信がブロックされている可能性があります）。ネットワーク環境やファイアウォールの設定を確認してください。")
             
         # Ensure fully connected (workaround for Pycord silent connection failures)
         import asyncio
