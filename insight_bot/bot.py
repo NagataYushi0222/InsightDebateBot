@@ -2,6 +2,8 @@ import discord
 from discord.ext import commands
 import os
 import sys
+import asyncio
+import traceback
 import webbrowser
 import requests
 import google.genai as genai_sdk # Rename to avoid conflict if any, though actually it's a module
@@ -247,25 +249,36 @@ async def analyze_start(ctx):
         voice_client = ctx.guild.voice_client
         
         if voice_client:
-            if not voice_client.is_connected():
-                # Clean up dirty state and reconnect
-                await voice_client.disconnect(force=True)
-                import asyncio
-                try:
-                    voice_client = await asyncio.wait_for(channel.connect(timeout=5.0), timeout=15.0)
-                except asyncio.TimeoutError:
-                    raise Exception("音声サーバーへの接続がタイムアウトしました（UDP通信がブロックされている可能性があります）。ネットワーク環境やファイアウォールの設定を確認してください。")
-            elif voice_client.channel.id != channel.id:
-                await voice_client.move_to(channel)
-        else:
-            import asyncio
+            # Always force disconnect first to clear any stale voice state
             try:
-                voice_client = await asyncio.wait_for(channel.connect(timeout=5.0), timeout=15.0)
-            except asyncio.TimeoutError:
-                raise Exception("音声サーバーへの接続がタイムアウトしました（UDP通信がブロックされている可能性があります）。ネットワーク環境やファイアウォールの設定を確認してください。")
+                await voice_client.disconnect(force=True)
+            except Exception:
+                pass
+            await asyncio.sleep(1)  # Give Discord time to process the disconnect
+        
+        # Clear any ghost voice state by sending a null voice state update
+        try:
+            await ctx.guild.change_voice_state(channel=None)
+            await asyncio.sleep(0.5)
+        except Exception:
+            pass
+        
+        # Connect with a generous timeout to allow Pycord's internal retry loop
+        # to handle Discord voice server switches (error 4017)
+        try:
+            voice_client = await channel.connect(timeout=30.0, reconnect=True)
+        except asyncio.TimeoutError:
+            raise Exception(
+                "音声サーバーへの接続がタイムアウトしました。\n"
+                "考えられる原因:\n"
+                "・ネットワークのUDP通信がブロックされている\n"
+                "・Discordの音声サーバーが一時的に不安定\n"
+                "少し時間をおいて再度お試しください。"
+            )
+        except Exception as conn_err:
+            raise Exception(f"音声チャンネルへの接続に失敗しました: {conn_err}")
             
-        # Ensure fully connected (workaround for Pycord silent connection failures)
-        import asyncio
+        # Ensure fully connected
         for _ in range(20): # Wait up to 10 seconds
             if voice_client.is_connected():
                 break
@@ -295,7 +308,6 @@ async def analyze_start(ctx):
             
     except Exception as e:
         # Cleanup if connection failed
-        import traceback
         traceback.print_exc()
         if session.voice_client:
              await session.stop_recording()
